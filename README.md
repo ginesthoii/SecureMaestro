@@ -1,9 +1,5 @@
 # SecureMaestro
 Secure, automated practice tools for musicians — inspired by Vivaldi’s Four Seasons and engineered with AppSec principles. Blending music and security, SecureMaestro offers sandboxed tools for looping, tempo-mapping, and safe performance analysis.
-# SecureMaestro
-
-**SecureMaestro** is an experimental project blending classical music practice with modern application security principles.  
-Inspired by Vivaldi’s *Four Seasons: Winter*, the goal is to create secure, automated tools that make learning music easier — while also showcasing secure coding and AppSec best practices.
 
 ---
 
@@ -57,6 +53,5 @@ This dual focus makes it both a **fun practice tool** and a **serious AppSec por
 
 ## Inspiration
 
-> “Like Vivaldi’s *Winter*, SecureMaestro is about balancing calm and chaos — control and unpredictability. Musicians fight to master their instrument; engineers fight to master complexity. This project merges the two.”
-
----
+> SecureMaestro is an experimental project blending classical music practice with modern application security principles.  
+Inspired by Vivaldi’s *Four Seasons: Winter*, the goal is to create secure, automated tools that make learning music easier — while also showcasing secure coding and AppSec best practices.
