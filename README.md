@@ -1,79 +1,77 @@
-# SecureMaestro
+<div align="center">
+  <img width="596" height="264" alt="Image" src="https://github.com/user-attachments/assets/b6823818-fb60-41e0-9c3a-06e6d74ea5bc" />
+</div>
 
-Secure, automated practice tools for musicians — inspired by Vivaldi’s *Four Seasons* and engineered with AppSec principles.  
-Blending music and security, SecureMaestro offers sandboxed tools for looping, tempo-mapping, and safe performance analysis.
+# SecureMaestro  
 
----
 
-## Features
+- Secure, automated practice tools for musicians — inspired by Vivaldi’s *Four Seasons* and engineered with AppSec principles.  
+- Blending music and security, SecureMaestro is a side project where I’m experimenting with audio libraries (pydub, librosa, spleeter, etc.) while also building in secure coding habits from the start. Half portfolio, half “let's see how this goes.”  
+
+
+## Features (planned + in progress)
 
 - **Practice Looper**  
-  Paste a YouTube link → select measures → auto-loop them at custom tempos (50%, 70%, 90%).  
-  *Tech: pydub, ffmpeg*  
+  Paste a YouTube link, choose a section, and loop it at slower tempos (50%, 70%, 90%).  
+  *Tech: pydub + ffmpeg*  
 
 - **TempoMap**  
-  Analyze performances (e.g., Karajan vs. student orchestra) → see where tempo speeds up/slows down.  
+  Compare two performances (Karajan vs. a student orchestra) → plot where tempos drift.  
   *Tech: librosa, matplotlib*  
 
 - **Orchestra Splitter**  
-  Isolate or mute specific instruments (solo violin, continuo, etc.) for practice.  
-  *Tech: spleeter/demucs*  
+  Isolate or mute specific instruments (e.g. violin vs. continuo) for practice.  
+  *Tech: spleeter, demucs*  
 
 - **Performance Health Check**  
-  Upload your own practice recording → get feedback on timing, intonation, and dynamics vs. a reference.  
+  Upload your own practice → get feedback on timing, intonation, dynamics vs. a reference.  
   *Tech: DTW, pitch detection*  
 
 - **Concert Metadata Collector**  
-  Auto-scrape performance metadata (composer, conductor, year, etc.) for clean reference cards.  
-  *Tech: YouTube API, MusicBrainz API*  
+  Pull composer/conductor/year info from YouTube and auto-generate a clean reference card.  
 
 ---
 
-## Security-First Engineering
+## Security Notes  
 
-Every feature is built with security-first design:
-- Safe handling of user uploads (malware scan + sandboxing).  
-- Input validation and rate limiting for YouTube/API integrations.  
-- Automated scanning with **Bandit**, **Semgrep**, and **Snyk**.  
-- CI/CD with GitHub Actions + CodeQL.  
+Since this doubles as an AppSec learning exercise, I’m baking in security from the start:  
 
-This dual focus makes SecureMaestro both a **fun practice tool** and a **serious AppSec portfolio project**.
+- Sandbox + malware scan on uploads  
+- Input validation / rate limiting on external APIs  
+- Static analysis with **Bandit** + **Semgrep**  
+- CI/CD checks with GitHub Actions + CodeQL  
 
 ---
 
-## Roadmap
+## Roadmap (rough sketch)
 
-- [ ] Repo scaffolding + secure Python setup  
-- [ ] Practice Looper MVP  
+- [ ] Scaffold repo + secure Python setup  
+- [ ] MVP of Practice Looper  
 - [ ] Add Bandit + Semgrep scanning  
-- [ ] Implement TempoMap visualizations  
-- [ ] Build Orchestra Splitter  
-- [ ] Secure file upload pipeline (sandbox + scan)  
-- [ ] Architecture diagram + design docs  
-- [ ] README polish with visuals  
+- [ ] Build TempoMap visualizations  
+- [ ] Orchestra Splitter prototype  
+- [ ] Secure upload pipeline (sandbox + scan)  
+- [ ] Architecture diagram + notes  
 
 ---
 
-## Architecture (Coming Soon)
+## Why this exists  
 
-_Planned diagram of system flow: input (YouTube/upload) → secure pipeline → analysis tools → outputs._
+I wanted to:  
+- Blend two weirdly specific interests (music + AppSec).  
+- Learn audio processing libraries.  
+- Show that even small/fun projects can be built with security in mind.  
+
+Also: the name **SecureMaestro** was too good not to run with.  
 
 ---
 
-## Inspiration
+## Badges  
 
-> SecureMaestro is an experimental project blending classical music practice with modern application security principles.  
-Inspired by Vivaldi’s *Four Seasons: Winter*, the goal is to create secure, automated tools that make learning music easier — while also showcasing secure coding and AppSec best practices.
+![Python](https://img.shields.io/badge/python-3.10+-blue)  
+![Security](https://img.shields.io/badge/security-bandit%20%7C%20semgrep%20%7C%20snyk-green)  
+
 ---
 
-## Inspiration
-
-> SecureMaestro is an experimental project blending classical music practice with modern application security principles.  
-Inspired by Vivaldi’s *Four Seasons: Winter*, the goal is to create secure, automated tools that make learning music easier — while also showcasing secure coding and AppSec best practices.
->
-> ---
->
-> > ![Python](https://img.shields.io/badge/python-3.10+-blue) 
-![Security](https://img.shields.io/badge/security-bandit%20%7C%20semgrep%20%7C%20snyk-green)
-> >
-> > ---
+### Notes  
+This README & repo will evolve once I actually get code in — right now it’s mostly a working sketch.  
