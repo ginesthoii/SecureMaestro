@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+# Uncomment if you prefer to generate sounds locally and not commit them:
+# sounds/
