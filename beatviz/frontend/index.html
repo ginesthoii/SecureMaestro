@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>SecureMaestro Beat Viz</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root { --ink:#e6e6f0; --bg:#0b0d12; --accent:#66d9ff; }
+    body{margin:0;font:16px/1.4 ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--ink);display:flex;min-height:100vh}
+    .wrap{margin:auto;max-width:960px;width:100%;padding:24px;display:grid;gap:16px}
+    .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    input[type="url"]{flex:1;min-width:320px;padding:10px 12px;border-radius:10px;border:1px solid #333;background:#111;color:var(--ink)}
+    button{padding:10px 14px;border:0;border-radius:10px;background:#1b2533;color:var(--ink);cursor:pointer}
+    button:hover{filter:brightness(1.15)}
+    #player{width:480px;height:270px;border-radius:12px;overflow:hidden}
+    .viz-card{background:#0e1220;border:1px solid #1b2440;border-radius:12px;padding:12px}
+    canvas{width:100%;height:160px;display:block}
+    .meta{opacity:.8;font-size:14px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>SecureMaestro • Beat Line</h1>
+    <div class="row">
+      <input id="yturl" type="url" placeholder="Paste a YouTube URL…" />
+      <button id="analyze">Analyze & Load</button>
+    </div>
+
+    <div class="row">
+      <div id="player"></div>
+      <div class="viz-card" style="flex:1">
+        <canvas id="viz" width="600" height="160"></canvas>
+        <div class="meta">
+          <div>Est. BPM: <span id="bpm">—</span></div>
+          <div>Beats: <span id="count">0</span></div>
+          <div>Tip: press play — the line “pops” on each detected beat.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- YouTube IFrame API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script>
+    let player, beats = [], onsets = [], bpm = 0, videoId = null;
+
+    // Simple URL -> id extraction (demo-grade)
+    function extractId(url){
+      try{
+        const u = new URL(url);
+        if (u.hostname.includes('youtu.be')) return u.pathname.replace('/','');
+        if (u.searchParams.get('v')) return u.searchParams.get('v');
+      }catch(e){}
+      return null;
+    }
+
+    document.getElementById('analyze').addEventListener('click', async () => {
+      const url = document.getElementById('yturl').value.trim();
+      if(!/^https?:\/\//.test(url)){ alert('Paste a valid YouTube URL.'); return; }
+
+      // Call backend
+      const q = new URLSearchParams({ url });
+      const res = await fetch(`http://localhost:8000/api/analyze?${q.toString()}`);
+      if(!res.ok){
+        alert('Analyze failed: ' + (await res.text()));
+        return;
+      }
+      const data = await res.json();
+      beats = data.beats;
+      onsets = data.onsets;
+      bpm = data.bpm_estimate;
+      videoId = extractId(url) || data.video_id;
+
+      document.getElementById('bpm').textContent = bpm.toFixed(1);
+      document.getElementById('count').textContent = beats.length;
+
+      // Load / cue video
+      if (player){
+        player.loadVideoById(videoId);
+      } else {
+        player = new YT.Player('player', {
+          videoId,
+          playerVars: { modestbranding: 1 },
+          events: { 'onReady': () => {/* noop */} }
+        });
+      }
+    });
+
+    // YouTube API bootstrap (required global)
+    function onYouTubeIframeAPIReady(){ /* created on first analyze */ }
+
+    // === Canvas Beat Viz ===
+    const canvas = document.getElementById('viz');
+    const ctx = canvas.getContext('2d');
+
+    // Bounce state
+    let lastBeatIndex = -1;
+    let impulse = 0; // goes to 1 on beat, then decays
+
+    function draw(){
+      requestAnimationFrame(draw);
+      const w = canvas.width, h = canvas.height;
+
+      // background
+      ctx.clearRect(0,0,w,h);
+
+      // current playback time
+      let t = 0;
+      if (player && player.getPlayerState){
+        const s = player.getPlayerState();
+        if (s === 1 || s === 2 || s === 3) t = player.getCurrentTime();
+      }
+
+      // trigger bounce if within 60ms of next beat
+      if (beats.length){
+        // find next beat (linear scan forward from last index)
+        const start = Math.max(0, lastBeatIndex);
+        for (let i = start; i < beats.length; i++){
+          const dt = beats[i] - t;
+          if (dt < 0 && i > lastBeatIndex){
+            // crossed a beat
+            lastBeatIndex = i;
+            impulse = 1; // full pop
+          }
+          if (dt > 0.2) break; // future beats - stop scanning
+        }
+      }
+
+      // decay impulse (ease out)
+      impulse *= 0.88;
+
+      // base line + bounce height
+      const base = h * 0.65;
+      const bounce = Math.pow(impulse, 0.8) * (h * 0.45); // nonlinear pop
+
+      // draw the “music line”
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = "#66d9ff";
+      ctx.beginPath();
+      const segments = 64;
+      for (let i=0;i<=segments;i++){
+        const x = (i/segments) * w;
+        // subtle wobble: follow a slow sine; add bounce vertical pop
+        const wobble = Math.sin((i*0.35) + t*2.2) * 8;
+        const y = base - bounce + wobble;
+        if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      }
+      ctx.stroke();
+
+      // small glow
+      ctx.globalAlpha = 0.25;
+      ctx.lineWidth = 10;
+      ctx.stroke();
+      ctx.globalAlpha = 1.0;
+
+      // draw beat ticks (context, optional)
+      ctx.fillStyle = "#3aaed8";
+      const span = 4; // show ticks within +/- 2s
+      if (beats.length){
+        for (const bt of beats){
+          if (Math.abs(bt - t) < span){
+            const rel = (bt - (t - span)) / (span*2);
+            const x = rel * w;
+            ctx.fillRect(x, h-8, 2, 8);
+          }
+        }
+      }
+    }
+    draw();
+  </script>
+</body>
+</html>
