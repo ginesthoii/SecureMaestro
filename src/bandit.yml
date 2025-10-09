@@ -1,0 +1,7 @@
+profiles: ["secure"]
+skips:
+  - B101  # assert_used (allowed in tests if you add them later)
+exclude_dirs:
+  - .venv
+  - tests
+  - .github

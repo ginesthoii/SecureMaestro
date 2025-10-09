@@ -1,0 +1,12 @@
+yt-dlp==2024.8.6
+pydub==0.25.1
+typer==0.12.3
+rich==13.5.2
+
+# analysis libs (useful later for TempoMap/plots)
+librosa==0.10.2.post1
+matplotlib==3.9.0
+soundfile==0.12.1
+numba==0.60.0
+numpy==2.0.1
+pydantic==2.8.2
